@@ -1,0 +1,31 @@
+import os
+
+# Take file name and input string from user
+file_name = input("Enter the name of the file (with extension): ")
+input_string = input("Enter the string of characters to write/append: ")
+
+# Check if file exists
+if os.path.exists(file_name):
+    print("File already exists.")
+
+    # Read the file and print the first and last line
+    with open(file_name, 'r') as f:
+        lines = f.readlines()
+        if len(lines) == 0:
+            print("The file is empty.")
+        elif len(lines) == 1:
+            print(f"Only one line in the file: {lines[0].strip()}")
+        else:
+            print(f"First line: {lines[0].strip()}")
+            print(f"Last line: {lines[-1].strip()}")
+
+    # Append the new string
+    with open(file_name, 'a') as f:
+        f.write(input_string + "\n")
+    print("The string has been appended to the file.")
+else:
+    # Create the file and write the string
+    with open(file_name, 'w') as f:
+        f.write(input_string + "\n")
+    print("File created.")
+    print("The string has been written into the file.")

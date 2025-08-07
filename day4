@@ -29,3 +29,23 @@ else:
         f.write(input_string + "\n")
     print("File created.")
     print("The string has been written into the file.")
+# Take source and destination file names from the user
+source_file = input("Enter the source filename: ")
+destination_file = input("Enter the destination filename: ")
+
+try:
+    # Open and read from the source file
+    with open(source_file, "r") as src:
+        content = src.read()
+        char_count = len(content)
+
+    # Write the content to the destination file
+    with open(destination_file, "w") as dest:
+        dest.write(content)
+
+    # Success message
+    print(f"\n✅ File copied successfully from '{source_file}' to '{destination_file}'.")
+    print(f"🔢 Total characters copied: {char_count}")
+
+except FileNotFoundError:
+    print(f"\n❌ Error: The file '{source_file}' was not found.")

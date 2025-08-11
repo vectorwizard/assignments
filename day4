@@ -1,51 +1,284 @@
-import os
+#include <stdio.h>
+#include <stdlib.h>
 
-# Take file name and input string from user
-file_name = input("Enter the name of the file (with extension): ")
-input_string = input("Enter the string of characters to write/append: ")
+// The Node structure remains the same
+struct Node {
+    int data;
+    struct Node *next;
+};
 
-# Check if file exists
-if os.path.exists(file_name):
-    print("File already exists.")
+// Global head pointer
+struct Node *head = NULL;
 
-    # Read the file and print the first and last line
-    with open(file_name, 'r') as f:
-        lines = f.readlines()
-        if len(lines) == 0:
-            print("The file is empty.")
-        elif len(lines) == 1:
-            print(f"Only one line in the file: {lines[0].strip()}")
-        else:
-            print(f"First line: {lines[0].strip()}")
-            print(f"Last line: {lines[-1].strip()}")
+// Function Prototypes
+void createList();
+void insertMenu();
+void deleteMenu();
+void insertAtFront(int data);
+void insertAtEnd(int data);
+void insertAtPosition(int data, int pos);
+void deleteAtFront();
+void deleteAtEnd();
+void deleteAtPosition(int pos);
+void displayList();
 
-    # Append the new string
-    with open(file_name, 'a') as f:
-        f.write(input_string + "\n")
-    print("The string has been appended to the file.")
-else:
-    # Create the file and write the string
-    with open(file_name, 'w') as f:
-        f.write(input_string + "\n")
-    print("File created.")
-    print("The string has been written into the file.")
-# Take source and destination file names from the user
-source_file = input("Enter the source filename: ")
-destination_file = input("Enter the destination filename: ")
+// The main function with an updated menu title
+int main() {
+    int choice;
+    while (1) {
+        printf("\n--- Circular Linked List Menu ---\n");
+        printf("1. Create the list\n");
+        printf("2. Insert an element\n");
+        printf("3. Delete an element\n");
+        printf("4. Display the list\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-try:
-    # Open and read from the source file
-    with open(source_file, "r") as src:
-        content = src.read()
-        char_count = len(content)
+        switch (choice) {
+            case 1:
+                createList();
+                break;
+            case 2:
+                insertMenu();
+                break;
+            case 3:
+                deleteMenu();
+                break;
+            case 4:
+                displayList();
+                break;
+            case 5:
+                printf("Exiting...\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+    return 0;
+}
 
-    # Write the content to the destination file
-    with open(destination_file, "w") as dest:
-        dest.write(content)
+// createList calls the modified insertAtEnd, so it works correctly
+void createList() {
+    // If list already exists, clear it first (optional, but good practice)
+    while (head != NULL) {
+        deleteAtFront();
+    }
+    int n, value, i;
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+    for (i = 0; i < n; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%d", &value);
+        insertAtEnd(value);
+    }
+}
 
-    # Success message
-    print(f"\n✅ File copied successfully from '{source_file}' to '{destination_file}'.")
-    print(f"🔢 Total characters copied: {char_count}")
+// No change needed in menu functions
+void insertMenu() {
+    int choice, data, pos;
+    printf("\n--- Insert Submenu ---\n");
+    printf("1. Insert at Front\n");
+    printf("2. Insert at End\n");
+    printf("3. Insert at Intermediate Position\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
 
-except FileNotFoundError:
-    print(f"\n❌ Error: The file '{source_file}' was not found.")
+    switch (choice) {
+        case 1:
+            printf("Enter the element to insert at front: ");
+            scanf("%d", &data);
+            insertAtFront(data);
+            break;
+        case 2:
+            printf("Enter the element to insert at end: ");
+            scanf("%d", &data);
+            insertAtEnd(data);
+            break;
+        case 3:
+            printf("Enter the element to insert: ");
+            scanf("%d", &data);
+            printf("Enter the position to insert at: ");
+            scanf("%d", &pos);
+            insertAtPosition(data, pos);
+            break;
+        default:
+            printf("Invalid insert choice\n");
+    }
+}
+
+// No change needed in menu functions
+void deleteMenu() {
+    int choice, pos;
+    printf("\n--- Delete Submenu ---\n");
+    printf("1. Delete from Front\n");
+    printf("2. Delete from End\n");
+    printf("3. Delete from Intermediate Position\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+
+    switch (choice) {
+        case 1:
+            deleteAtFront();
+            break;
+        case 2:
+            deleteAtEnd();
+            break;
+        case 3:
+            printf("Enter the position to delete from: ");
+            scanf("%d", &pos);
+            deleteAtPosition(pos);
+            break;
+        default:
+            printf("Invalid delete choice\n");
+    }
+}
+
+// MODIFIED displayList to handle circular traversal
+void displayList() {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    struct Node* temp = head;
+    printf("List (Circular): ");
+    // Use a do-while loop to ensure the first node is printed
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("(head: %d)\n", head->data); // Show that it links back to the head
+}
+
+// MODIFIED insertAtFront for circular logic
+void insertAtFront(int data) {
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    if (head == NULL) {
+        head = newNode;
+        newNode->next = head; // The single node points to itself
+        return;
+    }
+    struct Node* last = head;
+    while (last->next != head) { // Find the last node
+        last = last->next;
+    }
+    newNode->next = head;   // New node points to the old head
+    head = newNode;         // Update head pointer
+    last->next = head;      // The last node now points to the new head
+}
+
+// MODIFIED insertAtEnd for circular logic
+void insertAtEnd(int data) {
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    if (head == NULL) {
+        head = newNode;
+        newNode->next = head; // The single node points to itself
+        return;
+    }
+    struct Node* last = head;
+    while (last->next != head) { // Find the last node
+        last = last->next;
+    }
+    last->next = newNode;   // Old last node points to the new node
+    newNode->next = head;   // The new last node points to the head
+}
+
+// MODIFIED insertAtPosition for circular logic
+void insertAtPosition(int data, int pos) {
+    if (pos <= 0) {
+        printf("Invalid position!\n");
+        return;
+    }
+    if (pos == 1) {
+        insertAtFront(data);
+        return;
+    }
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    struct Node* temp = head;
+    // Traverse to the node *before* the desired position
+    for (int i = 1; i < pos - 1; i++) {
+        temp = temp->next;
+        // If we loop around, position is out of range
+        if (temp == head) {
+            printf("Position out of range!\n");
+            free(newNode);
+            return;
+        }
+    }
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+// MODIFIED deleteAtFront for circular logic
+void deleteAtFront() {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    struct Node* temp = head; // Node to be deleted
+    if (head->next == head) { // Case: Only one node
+        head = NULL;
+    } else {
+        struct Node* last = head;
+        while (last->next != head) { // Find last node
+            last = last->next;
+        }
+        head = head->next;     // Move head forward
+        last->next = head;     // Last node points to new head
+    }
+    free(temp); // Free the memory of the old head
+}
+
+// MODIFIED deleteAtEnd for circular logic
+void deleteAtEnd() {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    struct Node* delNode = head;
+    struct Node* prevNode = NULL;
+    if (head->next == head) { // Case: Only one node
+        head = NULL;
+    } else {
+        // Traverse until delNode is the last node
+        while (delNode->next != head) {
+            prevNode = delNode;
+            delNode = delNode->next;
+        }
+        prevNode->next = head; // Second-to-last node now points to head
+    }
+    free(delNode);
+}
+
+// MODIFIED deleteAtPosition for circular logic
+void deleteAtPosition(int pos) {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+    if (pos <= 0) {
+        printf("Invalid position!\n");
+        return;
+    }
+    if (pos == 1) {
+        deleteAtFront();
+        return;
+    }
+    struct Node* temp = head;
+    struct Node* prev = NULL;
+    // Traverse to the node at the specified position
+    for (int i = 1; i < pos; i++) {
+        prev = temp;
+        temp = temp->next;
+        // If we circle back, the position is out of range
+        if (temp == head) {
+            printf("Position out of range!\n");
+            return;
+        }
+    }
+    prev->next = temp->next; // Unlink the node to be deleted
+    free(temp);
+}

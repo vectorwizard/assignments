@@ -1,284 +1,57 @@
-#include <stdio.h>
-#include <stdlib.h>
+class Student:
+    # Class variables
+    college_name = "ABC College"
+    total_no_of_students = 0
 
-// The Node structure remains the same
-struct Node {
-    int data;
-    struct Node *next;
-};
+    # Constructor
+    def __init__(self, student_id, student_name):
+        self._student_id = student_id       # Protected attribute
+        self._student_name = student_name   # Protected attribute
+        Student.total_no_of_students += 1   # Increase student count
 
-// Global head pointer
-struct Node *head = NULL;
 
-// Function Prototypes
-void createList();
-void insertMenu();
-void deleteMenu();
-void insertAtFront(int data);
-void insertAtEnd(int data);
-void insertAtPosition(int data, int pos);
-void deleteAtFront();
-void deleteAtEnd();
-void deleteAtPosition(int pos);
-void displayList();
+class Marks(Student):
+    # Constructor
+    def __init__(self, student_id, student_name, marks1, marks2):
+        super().__init__(student_id, student_name)  # Initialize parent attributes
+        self.marks1 = marks1
+        self.marks2 = marks2
 
-// The main function with an updated menu title
-int main() {
-    int choice;
-    while (1) {
-        printf("\n--- Circular Linked List Menu ---\n");
-        printf("1. Create the list\n");
-        printf("2. Insert an element\n");
-        printf("3. Delete an element\n");
-        printf("4. Display the list\n");
-        printf("5. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
+    # Method to calculate average
+    def calculate_average(self):
+        return (self.marks1 + self.marks2) / 2
 
-        switch (choice) {
-            case 1:
-                createList();
-                break;
-            case 2:
-                insertMenu();
-                break;
-            case 3:
-                deleteMenu();
-                break;
-            case 4:
-                displayList();
-                break;
-            case 5:
-                printf("Exiting...\n");
-                exit(0);
-            default:
-                printf("Invalid choice. Try again.\n");
-        }
-    }
-    return 0;
-}
+    # Method to calculate grade
+    def calculate_grade(self):
+        avg = self.calculate_average()
+        if avg >= 90:
+            return "A+"
+        elif avg >= 75:
+            return "A"
+        elif avg >= 60:
+            return "B"
+        elif avg >= 40:
+            return "C"
+        else:
+            return "F"
 
-// createList calls the modified insertAtEnd, so it works correctly
-void createList() {
-    // If list already exists, clear it first (optional, but good practice)
-    while (head != NULL) {
-        deleteAtFront();
-    }
-    int n, value, i;
-    printf("Enter the number of elements: ");
-    scanf("%d", &n);
-    for (i = 0; i < n; i++) {
-        printf("Enter element %d: ", i + 1);
-        scanf("%d", &value);
-        insertAtEnd(value);
-    }
-}
+    # Display student info with marks and grade
+    def display_info(self):
+        print("College Name:", Student.college_name)
+        print("Student ID:", self._student_id)
+        print("Student Name:", self._student_name)
+        print("Marks1:", self.marks1)
+        print("Marks2:", self.marks2)
+        print("Average:", self.calculate_average())
+        print("Grade:", self.calculate_grade())
+        print("-" * 40)
 
-// No change needed in menu functions
-void insertMenu() {
-    int choice, data, pos;
-    printf("\n--- Insert Submenu ---\n");
-    printf("1. Insert at Front\n");
-    printf("2. Insert at End\n");
-    printf("3. Insert at Intermediate Position\n");
-    printf("Enter your choice: ");
-    scanf("%d", &choice);
 
-    switch (choice) {
-        case 1:
-            printf("Enter the element to insert at front: ");
-            scanf("%d", &data);
-            insertAtFront(data);
-            break;
-        case 2:
-            printf("Enter the element to insert at end: ");
-            scanf("%d", &data);
-            insertAtEnd(data);
-            break;
-        case 3:
-            printf("Enter the element to insert: ");
-            scanf("%d", &data);
-            printf("Enter the position to insert at: ");
-            scanf("%d", &pos);
-            insertAtPosition(data, pos);
-            break;
-        default:
-            printf("Invalid insert choice\n");
-    }
-}
+# Example usage
+s1 = Marks(101, "Arijit", 85, 92)
+s2 = Marks(102, "Rahul", 55, 63)
 
-// No change needed in menu functions
-void deleteMenu() {
-    int choice, pos;
-    printf("\n--- Delete Submenu ---\n");
-    printf("1. Delete from Front\n");
-    printf("2. Delete from End\n");
-    printf("3. Delete from Intermediate Position\n");
-    printf("Enter your choice: ");
-    scanf("%d", &choice);
+s1.display_info()
+s2.display_info()
 
-    switch (choice) {
-        case 1:
-            deleteAtFront();
-            break;
-        case 2:
-            deleteAtEnd();
-            break;
-        case 3:
-            printf("Enter the position to delete from: ");
-            scanf("%d", &pos);
-            deleteAtPosition(pos);
-            break;
-        default:
-            printf("Invalid delete choice\n");
-    }
-}
-
-// MODIFIED displayList to handle circular traversal
-void displayList() {
-    if (head == NULL) {
-        printf("List is empty!\n");
-        return;
-    }
-    struct Node* temp = head;
-    printf("List (Circular): ");
-    // Use a do-while loop to ensure the first node is printed
-    do {
-        printf("%d -> ", temp->data);
-        temp = temp->next;
-    } while (temp != head);
-    printf("(head: %d)\n", head->data); // Show that it links back to the head
-}
-
-// MODIFIED insertAtFront for circular logic
-void insertAtFront(int data) {
-    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
-    newNode->data = data;
-    if (head == NULL) {
-        head = newNode;
-        newNode->next = head; // The single node points to itself
-        return;
-    }
-    struct Node* last = head;
-    while (last->next != head) { // Find the last node
-        last = last->next;
-    }
-    newNode->next = head;   // New node points to the old head
-    head = newNode;         // Update head pointer
-    last->next = head;      // The last node now points to the new head
-}
-
-// MODIFIED insertAtEnd for circular logic
-void insertAtEnd(int data) {
-    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
-    newNode->data = data;
-    if (head == NULL) {
-        head = newNode;
-        newNode->next = head; // The single node points to itself
-        return;
-    }
-    struct Node* last = head;
-    while (last->next != head) { // Find the last node
-        last = last->next;
-    }
-    last->next = newNode;   // Old last node points to the new node
-    newNode->next = head;   // The new last node points to the head
-}
-
-// MODIFIED insertAtPosition for circular logic
-void insertAtPosition(int data, int pos) {
-    if (pos <= 0) {
-        printf("Invalid position!\n");
-        return;
-    }
-    if (pos == 1) {
-        insertAtFront(data);
-        return;
-    }
-    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
-    newNode->data = data;
-    struct Node* temp = head;
-    // Traverse to the node *before* the desired position
-    for (int i = 1; i < pos - 1; i++) {
-        temp = temp->next;
-        // If we loop around, position is out of range
-        if (temp == head) {
-            printf("Position out of range!\n");
-            free(newNode);
-            return;
-        }
-    }
-    newNode->next = temp->next;
-    temp->next = newNode;
-}
-
-// MODIFIED deleteAtFront for circular logic
-void deleteAtFront() {
-    if (head == NULL) {
-        printf("List is empty!\n");
-        return;
-    }
-    struct Node* temp = head; // Node to be deleted
-    if (head->next == head) { // Case: Only one node
-        head = NULL;
-    } else {
-        struct Node* last = head;
-        while (last->next != head) { // Find last node
-            last = last->next;
-        }
-        head = head->next;     // Move head forward
-        last->next = head;     // Last node points to new head
-    }
-    free(temp); // Free the memory of the old head
-}
-
-// MODIFIED deleteAtEnd for circular logic
-void deleteAtEnd() {
-    if (head == NULL) {
-        printf("List is empty!\n");
-        return;
-    }
-    struct Node* delNode = head;
-    struct Node* prevNode = NULL;
-    if (head->next == head) { // Case: Only one node
-        head = NULL;
-    } else {
-        // Traverse until delNode is the last node
-        while (delNode->next != head) {
-            prevNode = delNode;
-            delNode = delNode->next;
-        }
-        prevNode->next = head; // Second-to-last node now points to head
-    }
-    free(delNode);
-}
-
-// MODIFIED deleteAtPosition for circular logic
-void deleteAtPosition(int pos) {
-    if (head == NULL) {
-        printf("List is empty!\n");
-        return;
-    }
-    if (pos <= 0) {
-        printf("Invalid position!\n");
-        return;
-    }
-    if (pos == 1) {
-        deleteAtFront();
-        return;
-    }
-    struct Node* temp = head;
-    struct Node* prev = NULL;
-    // Traverse to the node at the specified position
-    for (int i = 1; i < pos; i++) {
-        prev = temp;
-        temp = temp->next;
-        // If we circle back, the position is out of range
-        if (temp == head) {
-            printf("Position out of range!\n");
-            return;
-        }
-    }
-    prev->next = temp->next; // Unlink the node to be deleted
-    free(temp);
-}
+print("Total Students:", Student.total_no_of_students)

@@ -1,57 +1,77 @@
-class Student:
-    # Class variables
-    college_name = "ABC College"
-    total_no_of_students = 0
+import random
 
-    # Constructor
-    def __init__(self, student_id, student_name):
-        self._student_id = student_id       # Protected attribute
-        self._student_name = student_name   # Protected attribute
-        Student.total_no_of_students += 1   # Increase student count
+# Step 1: Create random list
+lst = [random.randint(1, 9) for _ in range(20)]
+print("Original List:", lst)
 
+# (a) Function to find unique elements (occur only once)
+def unique(lst):
+    result = []
+    for x in lst:
+        if lst.count(x) == 1:
+            result.append(x)
+    return result
 
-class Marks(Student):
-    # Constructor
-    def __init__(self, student_id, student_name, marks1, marks2):
-        super().__init__(student_id, student_name)  # Initialize parent attributes
-        self.marks1 = marks1
-        self.marks2 = marks2
+# (b) Function to find duplicates with occurrences
+def duplicate(lst):
+    result = {}
+    for x in lst:
+        count = lst.count(x)
+        if count > 1:
+            result[x] = count
+    return result
 
-    # Method to calculate average
-    def calculate_average(self):
-        return (self.marks1 + self.marks2) / 2
+# (c) Function to create unique list (remove duplicates, keep each element once)
+def createuniq(lst):
+    return list(set(lst))
 
-    # Method to calculate grade
-    def calculate_grade(self):
-        avg = self.calculate_average()
-        if avg >= 90:
-            return "A+"
-        elif avg >= 75:
-            return "A"
-        elif avg >= 60:
-            return "B"
-        elif avg >= 40:
-            return "C"
-        else:
-            return "F"
+# Test
+print("Unique Elements (occur once):", unique(lst))
+print("Duplicate Elements with counts:", duplicate(lst))
+print("List with unique elements (each only once):", createuniq(lst))
 
-    # Display student info with marks and grade
-    def display_info(self):
-        print("College Name:", Student.college_name)
-        print("Student ID:", self._student_id)
-        print("Student Name:", self._student_name)
-        print("Marks1:", self.marks1)
-        print("Marks2:", self.marks2)
-        print("Average:", self.calculate_average())
-        print("Grade:", self.calculate_grade())
-        print("-" * 40)
+def has_three_zeros(num_str):
+    """Check if the number string contains at least 3 zeros."""
+    return num_str.count("0") >= 3
 
+# Step (a) Initialize sets
+s1, s2 = set(), set()
 
-# Example usage
-s1 = Marks(101, "Arijit", 85, 92)
-s2 = Marks(102, "Rahul", 55, 63)
+# Step (b) Take input for s1
+print("Enter numbers for Set s1 (Stop when a number contains at least three zeros):")
+while True:
+    num_str = input("Enter a number for s1: ")
+    if has_three_zeros(num_str):
+        print("Stopping input for s1.")
+        break
+    s1.add(int(num_str))
 
-s1.display_info()
-s2.display_info()
+# Take input for s2
+print("\nEnter numbers for Set s2 (Stop when a number contains at least three zeros):")
+while True:
+    num_str = input("Enter a number for s2: ")
+    if has_three_zeros(num_str):
+        print("Stopping input for s2.")
+        break
+    s2.add(int(num_str))
 
-print("Total Students:", Student.total_no_of_students)
+# Step (d) Ask user for operation
+print("\nChoose set operation to perform:")
+print("1. Union")
+print("2. Intersection")
+print("3. Set Difference (s1 - s2)")
+
+choice = input("Enter your choice (1/2/3): ")
+
+# Step (e) Perform operation
+if choice == "1":
+    result = s1.union(s2)
+    print(f"\nUnion of s1 and s2: {result}")
+elif choice == "2":
+    result = s1.intersection(s2)
+    print(f"\nIntersection of s1 and s2: {result}")
+elif choice == "3":
+    result = s1.difference(s2)
+    print(f"\nSet Difference (s1 - s2): {result}")
+else:
+    print("Invalid choice.")
